@@ -7,11 +7,13 @@ public class PlayerMovement : MonoBehaviour
     public float speed = 10f;
 
     Rigidbody2D rb;
+    Animator animator;
 
     // Start is called before the first frame update
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -32,6 +34,8 @@ public class PlayerMovement : MonoBehaviour
         {
             direction = direction.normalized;
         }
+
+        animator.SetFloat("Speed", direction.magnitude);
 
         rb.velocity = direction * speed;
     }
