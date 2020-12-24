@@ -8,6 +8,8 @@ public class Player : MonoBehaviour
     public GameObject shootPosition;
 
     public float fireRate = 1f;
+    public int health = 100;
+    public bool isDead = false;
 
     float nextFire; //через сколько времени можно произвести следующий выстрел
 
@@ -18,10 +20,14 @@ public class Player : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    // Start is called before the first frame update
-    void Start()
+    public void UpdateHealth(int amount)
     {
-        
+        health += amount;
+
+        if (health <= 0)
+        {
+            isDead = true;
+        }
     }
 
     // Update is called once per frame
