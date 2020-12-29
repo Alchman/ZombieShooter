@@ -38,6 +38,7 @@ public class Player : MonoBehaviour
 
     private void CheckFire()
     {
+
         if (Input.GetButton("Fire1") && nextFire <= 0)
         {
             Shoot();
@@ -55,5 +56,6 @@ public class Player : MonoBehaviour
         animator.SetTrigger("Shoot");
         Instantiate(bulletPrefab, shootPosition.transform.position, transform.rotation);
         nextFire = fireRate;
+
     }
 }

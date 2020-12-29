@@ -1,9 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Zombie : MonoBehaviour
 {
+    public Action HealthChanged = delegate { }; //delegate { } - пустое действие, чтобы не было ошибки в случае, если никто не подпишется
+
     [Header("AI config")]
     public float moveRadius = 10;
     public float standbyRadius = 15;
@@ -50,6 +53,13 @@ public class Zombie : MonoBehaviour
 
         startPosition = transform.position;
         ChangeState(ZombieState.STAND);
+
+        HealthChanged += Method1;
+    }
+
+    void Method1()
+    {
+        print("Health changed");
     }
 
     public void UpdateHealth(int amount)
@@ -60,6 +70,12 @@ public class Zombie : MonoBehaviour
             isDead = true;
             //trigger animation death
         }
+        HealthChanged(); //вызов события
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        Bullet bullet = collision.GetComponent<Bullet>();
+        UpdateHealth(-bullet.damage);
     }
 
     // Update is called once per frame
@@ -138,12 +154,29 @@ public class Zombie : MonoBehaviour
 
     private bool CheckMoveToPlayer()
     {
-        if (distanceToPlayer < moveRadius)
+        //проверям радиус
+        if (distanceToPlayer > moveRadius)
         {
-            ChangeState(ZombieState.MOVE_TO_PLAYER);
-            return true;
+            return false;
         }
-        return false;
+
+
+        //проверям препятствия
+        Vector3 directionToPlayer = player.transform.position - transform.position;
+        Debug.DrawRay(transform.position, directionToPlayer, Color.red);
+
+        LayerMask layerMask = LayerMask.GetMask("Obstacles");
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, directionToPlayer.magnitude, layerMask);
+        if(hit.collider != null)
+        {
+            //есть коллайдер
+            return false;
+        }
+
+
+        //бежать за игроком
+        ChangeState(ZombieState.MOVE_TO_PLAYER);
+        return true;
     }
 
     private void DoMove()

@@ -15,7 +15,10 @@ public class Bomb : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        //TODO check tab Bullet
+        //TODO check tag Bullet
+        Bullet bullet = collision.GetComponent<Bullet>();
+        
+        print("damage: " + bullet.damage);
 
         Explode();
     }
@@ -29,10 +32,9 @@ public class Bomb : MonoBehaviour
 
         foreach(Collider2D collider in colliders)
         {
-            //if (collider.gameObject.CompareTag("Player"))
-            //{
-
-            //}
+            if (collider.gameObject.CompareTag("Player"))
+            {
+            }
             collider.gameObject.SendMessage("UpdateHealth", -damage);
         }
     }
