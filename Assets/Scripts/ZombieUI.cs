@@ -22,10 +22,8 @@ public class ZombieUI : MonoBehaviour
         healthSlider.value = zombie.health;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void LateUpdate()
     {
-        //healthSlider.value = zombie.health;
         transform.rotation = Quaternion.identity;
     }
 }

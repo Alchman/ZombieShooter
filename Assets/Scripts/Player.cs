@@ -1,9 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public Action OnHealthChange = delegate { };
+    public Action OnDeath = delegate { };
+
     public Bullet bulletPrefab;
     public GameObject shootPosition;
 
@@ -23,10 +27,12 @@ public class Player : MonoBehaviour
     public void UpdateHealth(int amount)
     {
         health += amount;
+        OnHealthChange();
 
         if (health <= 0)
         {
             isDead = true;
+            OnDeath();
         }
     }
 

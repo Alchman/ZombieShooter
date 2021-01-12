@@ -11,6 +11,7 @@ public class Zombie : MonoBehaviour
     public float moveRadius = 10;
     public float standbyRadius = 15;
     public float attackRadius = 3;
+    public int viewAngle = 90;
 
     [Header("Gameplay config")]
     public float attackRate = 1f;
@@ -54,12 +55,12 @@ public class Zombie : MonoBehaviour
         startPosition = transform.position;
         ChangeState(ZombieState.STAND);
 
-        HealthChanged += Method1;
+        player.OnDeath += PlayerDied;
     }
 
-    void Method1()
+    private void PlayerDied()
     {
-        print("Health changed");
+        ChangeState(ZombieState.RETURN);
     }
 
     public void UpdateHealth(int amount)
@@ -68,6 +69,9 @@ public class Zombie : MonoBehaviour
         if(health <= 0)
         {
             isDead = true;
+            Destroy(gameObject);
+
+            player.OnDeath -= PlayerDied;
             //trigger animation death
         }
         HealthChanged(); //вызов события
@@ -129,12 +133,15 @@ public class Zombie : MonoBehaviour
 
     private void DoStand()
     {
-        CheckMoveToPlayer();
+        if (!player.isDead)
+        {
+            CheckMoveToPlayer();
+        }
     }
 
     private void DoReturn()
     {
-        if (CheckMoveToPlayer())
+        if (!player.isDead && CheckMoveToPlayer())
         {
             return;
         }
@@ -164,6 +171,12 @@ public class Zombie : MonoBehaviour
         //проверям препятствия
         Vector3 directionToPlayer = player.transform.position - transform.position;
         Debug.DrawRay(transform.position, directionToPlayer, Color.red);
+
+        float angle = Vector3.Angle(-transform.up, directionToPlayer);
+        if(angle > viewAngle / 2)
+        {
+            return false;
+        }
 
         LayerMask layerMask = LayerMask.GetMask("Obstacles");
         RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, directionToPlayer.magnitude, layerMask);
