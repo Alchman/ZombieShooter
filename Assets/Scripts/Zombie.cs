@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pathfinding;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,7 +24,8 @@ public class Zombie : MonoBehaviour
     ZombieState activeState;
 
     Animator animator;
-    ZombieMovement movement;
+    AIPath aiPath;
+    AIDestinationSetter aiDestinationSetter;
 
 
     float nextAttack; //через сколько времени можно произвести следующую атаку
@@ -44,7 +46,8 @@ public class Zombie : MonoBehaviour
     private void Awake()
     {
         animator = GetComponent<Animator>();
-        movement = GetComponent<ZombieMovement>();
+        aiPath = GetComponent<AIPath>();
+        aiDestinationSetter = GetComponent<AIDestinationSetter>();
     }
 
     // Start is called before the first frame update
@@ -114,18 +117,19 @@ public class Zombie : MonoBehaviour
         switch (newState)
         {
             case ZombieState.STAND:
-                movement.enabled = false;
+                aiPath.enabled = false;
                 break;
             case ZombieState.RETURN:
-                movement.targetPosition = startPosition;
-                movement.enabled = true;
+                //aiDestinationSetter.target = startPosition
+                aiPath.enabled = true;
                 break;
             case ZombieState.MOVE_TO_PLAYER:
-                movement.enabled = true;
+                aiPath.enabled = true;
+                aiDestinationSetter.target = player.transform;
                 //Play move sound
                 break;
             case ZombieState.ATTACK:
-                movement.enabled = false;
+                aiPath.enabled = false;
                 break;
         }
         activeState = newState;
@@ -197,16 +201,18 @@ public class Zombie : MonoBehaviour
         if (distanceToPlayer < attackRadius)
         {
             ChangeState(ZombieState.ATTACK);
+            animator.SetFloat("Speed", 0);
             return;
         }
         if (distanceToPlayer > standbyRadius)
         {
             ChangeState(ZombieState.RETURN);
+            animator.SetFloat("Speed", 0);
             return;
         }
 
-        //move
-        movement.targetPosition = player.transform.position;
+
+        animator.SetFloat("Speed", 1);
     }
     private void DoAttack()
     {
