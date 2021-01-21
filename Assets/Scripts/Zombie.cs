@@ -33,7 +33,9 @@ public class Zombie : MonoBehaviour
 
     bool isDead = false;
 
-    Vector3 startPosition;
+    //Vector3 startPosition;
+    Transform startTransform;
+
 
     enum ZombieState
     {
@@ -53,12 +55,15 @@ public class Zombie : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        player = FindObjectOfType<Player>();
+        player = Player.Instance;
 
-        startPosition = transform.position;
         ChangeState(ZombieState.STAND);
 
         player.OnDeath += PlayerDied;
+
+        GameObject startPosGO = new GameObject(name + "_startPosition");
+        startPosGO.transform.position = transform.position;
+        startTransform = startPosGO.transform;
     }
 
     private void PlayerDied()
@@ -120,7 +125,7 @@ public class Zombie : MonoBehaviour
                 aiPath.enabled = false;
                 break;
             case ZombieState.RETURN:
-                //aiDestinationSetter.target = startPosition
+                aiDestinationSetter.target = startTransform;
                 aiPath.enabled = true;
                 break;
             case ZombieState.MOVE_TO_PLAYER:
@@ -155,7 +160,7 @@ public class Zombie : MonoBehaviour
         //    return;
         //}
 
-        float distanceToStart = Vector3.Distance(transform.position, startPosition);
+        float distanceToStart = Vector3.Distance(transform.position, startTransform.position);
         if (distanceToStart <= 0.05f) 
         {
             ChangeState(ZombieState.STAND);
@@ -261,5 +266,14 @@ public class Zombie : MonoBehaviour
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, standbyRadius);
+
+
+        Gizmos.color = Color.cyan;
+        Vector3 lookDirection = -transform.up;
+        Vector3 leftViewVector = Quaternion.AngleAxis(viewAngle / 2, Vector3.forward) * lookDirection;
+        Vector3 rightViewVector = Quaternion.AngleAxis(-viewAngle / 2, Vector3.forward) * lookDirection;
+
+        Gizmos.DrawRay(transform.position, leftViewVector * moveRadius);
+        Gizmos.DrawRay(transform.position, rightViewVector * moveRadius);
     }
 }

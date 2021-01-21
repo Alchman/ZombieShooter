@@ -25,8 +25,14 @@ public class PlayerMovement : MonoBehaviour
 
     void Move()
     {
+
+#if UNITY_ANDROID
+        float inputX = Joystick.Horizontal;
+        float inputY = Joystick.Vertical;
+#else
         float inputX = Input.GetAxis("Horizontal");
         float inputY = Input.GetAxis("Vertical");
+#endif
 
         Vector2 direction = new Vector2(inputX, inputY);
 

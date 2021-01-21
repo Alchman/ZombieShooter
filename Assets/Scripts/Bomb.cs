@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Lean.Pool;
 
 public class Bomb : MonoBehaviour
 {
@@ -25,7 +26,7 @@ public class Bomb : MonoBehaviour
 
     private void Explode()
     {
-        Instantiate(explosionEffectPrefab, transform.position, Quaternion.identity);
+        LeanPool.Spawn(explosionEffectPrefab, transform.position, Quaternion.identity);
         Destroy(gameObject);
 
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, radius, damageLayers);

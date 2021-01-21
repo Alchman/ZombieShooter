@@ -1,10 +1,30 @@
-﻿using System;
+﻿using Lean.Pool;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    private static Player instance;
+    public static Player Instance
+    {
+        get
+        {
+            return instance;
+        }
+    }
+
+
+    public int Health
+    {
+        get
+        {
+            return health;
+        }
+    }
+
+
     public Action OnHealthChange = delegate { };
     public Action OnDeath = delegate { };
 
@@ -12,8 +32,9 @@ public class Player : MonoBehaviour
     public GameObject shootPosition;
 
     public float fireRate = 1f;
-    public int health = 100;
     public bool isDead = false;
+
+    [SerializeField] private int health = 100;
 
     float nextFire; //через сколько времени можно произвести следующий выстрел
 
@@ -21,6 +42,14 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
+        if (instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        instance = this;
+
         animator = GetComponent<Animator>();
     }
 
@@ -60,8 +89,16 @@ public class Player : MonoBehaviour
     {
         //TODO sound
         animator.SetTrigger("Shoot");
-        Instantiate(bulletPrefab, shootPosition.transform.position, transform.rotation);
+        LeanPool.Spawn(bulletPrefab, shootPosition.transform.position, transform.rotation);
         nextFire = fireRate;
 
+    }
+
+    private void OnDestroy()
+    {
+        if (this == instance)
+        {
+            instance = null;
+        }
     }
 }

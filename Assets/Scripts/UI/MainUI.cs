@@ -6,19 +6,18 @@ public class MainUI : MonoBehaviour
 {
     public Slider playerHealth;
     public GameObject gameOverPanel;
-    //TODO Ppublic Image playerPortrait; 
+    //TODO public Image playerPortrait; 
 
-    private Player player;
+    //private Player player;
 
     void Start()
     {
-        player = FindObjectOfType<Player>();
+        //player = Player.Instance;
+        Player.Instance.OnHealthChange += UpdateHealth;
+        Player.Instance.OnDeath += ShowGameOver;
 
-        player.OnHealthChange += UpdateHealth;
-        player.OnDeath += ShowGameOver;
-
-        playerHealth.maxValue = player.health;
-        playerHealth.value = player.health;
+        playerHealth.maxValue = Player.Instance.Health;
+        playerHealth.value = Player.Instance.Health;
     }
 
     private void ShowGameOver()
@@ -34,6 +33,6 @@ public class MainUI : MonoBehaviour
 
     private void UpdateHealth()
     {
-        playerHealth.value = player.health;
+        playerHealth.value = Player.Instance.Health;
     }
 }
